@@ -51,6 +51,8 @@ class Tokenizer(object):
 
     def _longest_match(self, text, max_len, start, end):
         for length in reversed(range(1, max_len+1)):
+            if length not in self.automata_by_len:
+                continue
             matches = self.automata_by_len[length].iter(text, start, end)
             try:
                 match_start, match_end = self._pick_match(matches)
@@ -129,6 +131,8 @@ class Tokenizer(object):
             strings_by_len[k] = list(g)
         automata_by_len = {}
         for i in range(1, max_len+1):
+            if i not in strings_by_len:
+                continue
             a = Automaton()
             for s in strings_by_len[i]:
                 a.add_word(s, i)
