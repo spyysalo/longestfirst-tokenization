@@ -97,9 +97,9 @@ class Tokenizer(object):
             match_start, match_end, length = self._longest_match(
                 text, max_len, start, end)
             # length-1 for first part b/c match is leftmost of longest
-            return (self._tokenize(text, length-1, start, match_start) +
+            return (self._tokenize_recursive(text, length-1, start, match_start) +
                     [text[match_start:match_end]] +
-                    self._tokenize(text, length, match_end, end))
+                    self._tokenize_recursive(text, length, match_end, end))
         except NoMatch:
             raise ValueError('failed to tokenize: {}'.format(text[start:end]))
 
