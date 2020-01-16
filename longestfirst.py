@@ -179,10 +179,11 @@ class TrieTokenizer(object):
         self._longest = None
 
     def _init_longest(self, text):
-        self._longest = [
-            len(self.trie.longest_prefix(text[i:], default=''))
-            for i in range(len(text))
-        ]
+        self._longest = [0] * len(text)
+        for i in range(len(text)):
+            p = self.trie.longest_prefix(text[i:]).key
+            if p is not None:
+                self._longest[i] = len(p)
 
     def _update_longest(self, text, start, end):
         # Update self._longest for range [start:end] to contain the
@@ -190,8 +191,9 @@ class TrieTokenizer(object):
         # assuring that no match goes past the end position.
         for i in range(start, end):
             if i + self._longest[i] > end:
-                self._longest[i] = len(self.trie.longest_prefix(text[i:end],
-                                                                default=''))
+                p = self.trie.longest_prefix(text[i:end]).key
+                if p is not None:
+                    self._longest[i] = len(p)
 
     def _longest_match(self, text, start, end):
         self._update_longest(text, start, end)
@@ -263,8 +265,8 @@ class TrieTokenizer(object):
 
     @staticmethod
     def build_trie(alphabet, vocab):
-        from datrie import Trie
-        trie = Trie(alphabet)
+        from pygtrie import CharTrie as Trie
+        trie = Trie()
         start_time = datetime.now()
         info('start building trie at {}'.format(
             start_time.strftime("%H:%M:%S")))
